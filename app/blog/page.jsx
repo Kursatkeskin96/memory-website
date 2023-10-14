@@ -35,6 +35,13 @@ export default function Blog() {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      redirect("/");
+    }
+  }, [status]);
+
+
+  useEffect(() => {
     const fetchData = async () => {
       const data = await fetchBlogs();
       setBlogs(data);

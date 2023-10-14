@@ -26,6 +26,13 @@ export default function Kelime() {
 
   const [words, setWords] = useState([]);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      redirect("/");
+    }
+  }, [status]);
+
+
 
   useEffect(() => {
     const fetchData = async () => {

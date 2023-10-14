@@ -12,7 +12,6 @@ register('tr', tr);
 
 export default function BlogDetails(ctx) {
 
-
     if (typeof window !== 'undefined') {
         var currentURL = window.location.href;
         var urlParts = currentURL.split("/");
