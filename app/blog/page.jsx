@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image'
 import blog from '@/images/blog1.jpg'
 import Link from 'next/link'
-import { redirect } from "next/navigation";
 import { useSession } from 'next-auth/react';
 
 export async function fetchBlogs(){
@@ -34,13 +33,6 @@ export async function fetchBlogs(){
 export default function Blog() {
   const { data: session, status } = useSession();
   const [blogs, setBlogs] = useState([]);
-
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      redirect("/");
-    }
-  }, [status]);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -20,11 +20,13 @@ const Login = () => {
 
         if (password === '' || username === '') {
             toast.error("Fill all fields!")
+            setLoading(false)
             return
         }
 
         if (password.length < 6) {
             toast.error("Password must be at least 6 characters long")
+            setLoading(false)
             return
         }
 
@@ -35,6 +37,7 @@ const Login = () => {
                 router.push("/")
             } else {
                 toast.error("Error occured while logging")
+                setLoading(false)
             }
         } catch (error) {
             console.log(error)

@@ -3,7 +3,7 @@ import { verifyJwtToken } from "@/lib/jwt";
 import Gallery from "@/models/Gallery";
 
 export async function GET(req, ctx) {
-    await db.connect()
+    await connectToDB()
 
     const id = ctx.params.id
 
@@ -17,7 +17,7 @@ export async function GET(req, ctx) {
 }
 
 export async function PUT(req, ctx) {
-    await db.connect()
+    await connectToDB()
 
     const id = ctx.params.id
     const accessToken = req.headers.get('authorization')
@@ -46,7 +46,7 @@ export async function PUT(req, ctx) {
 }
 
 export async function DELETE(req, ctx) {
-    await db.connect()
+    await connectToDB()
 
     const id = ctx.params.id
 

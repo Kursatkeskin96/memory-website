@@ -10,7 +10,6 @@ import Link from "next/link";
 export default function Page() {
   const { data: session } = useSession();
   const [providers, setProviders] = useState(null);
-  const [home, setHome] = useState([]);
 
 
   useEffect(() => {
@@ -28,15 +27,6 @@ export default function Page() {
   }
 
   const api = domain;
-
-  useEffect(() => {
-    const fetchHome = async () => {
-      const response = await fetch(`${api}api/home`);
-      const data = await response.json();
-      setHome(data);
-    };
-      fetchHome();
-  }, []);
 
   return (
     <div className="min-h-screen">

@@ -7,7 +7,7 @@ export async function GET(req) {
     await connectToDB()
 
     try {
-        const words = await Word.find({}).limit(16).populate("authorId")
+        const words = await Word.find({}).populate("authorId")
         return new Response(JSON.stringify(words), { status: 200 })
     } catch (error) {
         return new Response(JSON.stringify(null), { status: 500 })

@@ -6,7 +6,7 @@ export const revalidate = 0; //revalidate api every 1 second
 export async function GET(req) {
     await connectToDB()
     try {
-        const blogs = await Blog.find({}).limit(16).populate("authorId")
+        const blogs = await Blog.find({}).populate("authorId")
         return new Response(JSON.stringify(blogs), { status: 200 })
     } catch (error) {
         return new Response(JSON.stringify(null), { status: 500 })

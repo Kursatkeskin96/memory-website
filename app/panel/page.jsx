@@ -11,13 +11,17 @@ function Panel() {
   const CLOUD_NAME = 'dqtnjtoby'
   const UPLOAD_PRESET = 'gunes_blog'
   const router = useRouter();
-  const form = useRef();
+  const userForm = useRef();
+  const kelimeForm = useRef();
+  const galleryForm = useRef();
 
-  const [submitting,setSubmitting] = useState(false);
+  useEffect(() => {
+    if (session?.user?.role ==! "admin") {
+      redirect("/");
+    }
+  }, [status]);
 
-  
-
-
+  const [submitting, setSubmitting] = useState(false);
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -53,8 +57,8 @@ function Panel() {
       });
   
       if (res.ok) {
-        toast.success('Successfully registered');
-        form.current.reset();
+        toast.success('Kullanici Eklendi');
+        userForm.current.reset();
         return;
       } else {
         toast.error('Error while registering');
@@ -70,7 +74,7 @@ function Panel() {
 
   const handleKelime = async (e) => {
     e.preventDefault()
-
+    kelimeForm.current.reset();
     if(!kelime || !desc){
         toast.error("All fields are required")
         return
@@ -94,8 +98,7 @@ function Panel() {
       })
 
       if (res.ok) {
-        toast.success('Successfully registered');
-        form.current.reset();
+        toast.success('Kelime eklendi');
         return;
       } else {
         toast.error('Error while registering');
@@ -162,8 +165,8 @@ const uploadImage = async () => {
     const data = await res.json()
 
     const imageUrl = data['secure_url']
-    form.current.reset();
-    toast.success('Successfully registered');
+    galleryForm.current.reset();
+    toast.success('Fotograf galeriye eklendi.');
     return imageUrl
   
   } catch (error) {
@@ -177,7 +180,7 @@ const uploadImage = async () => {
     <h1 className='text-lg mb-4'>Kullanici Olustur</h1>
   </div>
   <div className='flex flex-col justify-center items-center'>
-    <form  ref={form} onSubmit={handleSubmit}>
+    <form  ref={userForm} onSubmit={handleSubmit}>
       <input className='rounded-md pl-2 w-52 block' type="text" placeholder='Username' onChange={(e) => setUsername(e.target.value)} />
       <input className='rounded-md pl-2 w-52 block my-4' type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
       <select className='rounded-md pl-2 w-52 block mx-auto' value={role} id="roles" onChange={(e) => setRole(e.target.value)} >
@@ -196,7 +199,7 @@ const uploadImage = async () => {
   <div>
   <h1 className='text-lg mb-4'>Kelime Olustur</h1>
   </div>
-      <form ref={form} onSubmit={handleKelime}>
+      <form ref={kelimeForm} onSubmit={handleKelime}>
         <input className='rounded-md pl-2 block w-52 ' type="text" placeholder='Kelime' onChange={(e) => setKelime(e.target.value)} />
         <input className='rounded-md pl-2 block my-4 w-52 ' type="text" placeholder='Anlami' onChange={(e) => setDesc(e.target.value)} />
         <button className='block mt-2 w-20 mx-auto bg-[#C7D3D1] text-black p-1 rounded-md border-[1px] border-white' >Olustur</button>
@@ -206,7 +209,7 @@ const uploadImage = async () => {
       <div>
       <div className='bg-[#F4F2DE] flex flex-col justify-center items-center w-[70%] mx-auto mt-10 mb-10 rounded-md shadow-lg py-4'>
       <h1 className='text-lg mb-4'>Fotograf Olustur</h1>
-                <form ref={form} onSubmit={handleGallery}>
+                <form ref={galleryForm} onSubmit={handleGallery}>
                     <input className='block w-52 rounded-md pl-2' type="text" placeholder='Title...' onChange={(e) => setTitle(e.target.value)} />
                     <label className='block text-center w-32 mx-auto bg-[#E9B384] text-white rounded-md p-1 cursor-pointer my-4' htmlFor='image'>
                         Upload Image

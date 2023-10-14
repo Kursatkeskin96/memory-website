@@ -7,7 +7,7 @@ export async function GET(req) {
     await connectToDB()
 
     try {
-        const galleries = await Gallery.find({}).limit(16).populate("authorId")
+        const galleries = await Gallery.find({}).populate("authorId")
         return new Response(JSON.stringify(galleries), { status: 200 })
     } catch (error) {
         return new Response(JSON.stringify(null), { status: 500 })
