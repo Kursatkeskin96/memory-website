@@ -5,9 +5,131 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import {Chart as ChartJS} from 'chart.js/auto';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import Link from 'next/link';
+import {AiOutlineUser} from 'react-icons/ai'
+import {FaPencilAlt} from 'react-icons/fa'
+import {HiPhotograph} from 'react-icons/hi'
+import {BsFillChatTextFill} from 'react-icons/bs'
 
 function Panel() {
+
+
+  const [userStats, setUserStats] = useState(null);
+  const [blogStats, setBlogStats] = useState(null);
+  const [galleryStats, setGalleryStats] = useState(null);
+  const [wordStats, setWordStats] = useState(null);
+  const [userName, setUserName] = useState(null);
   const { data: session, status } = useSession();
+
+useEffect(() => {
+  const fetchUserName = async () => {
+    try {
+      if (!session) {
+        // Session is not available yet, so exit the function
+        return;
+      }
+
+      const userResponse = await fetch('/api/users');
+      const userData = await userResponse.json();
+
+      const currentUser = userData.find(user => user._id === session.user._id);
+      if (currentUser) {
+        setUserName(currentUser.username);
+
+      } else {
+        console.error('User not found');
+      }
+    } catch (error) {
+      console.error('error fetching user data:', error);
+    }
+  };
+  fetchUserName();
+}, [session]); // Add session to the dependency array
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const blogResponse = await fetch('/api/blog');
+        const galleryResponse = await fetch('/api/gallery');
+        const wordResponse = await fetch('/api/kelime');
+  
+        const blogData = await blogResponse.json();
+        const galleryData = await galleryResponse.json();
+        const wordData = await wordResponse.json();
+
+  
+        setBlogStats(blogData);
+        setGalleryStats(galleryData);
+        setWordStats(wordData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  const blogsCount = blogStats ? blogStats.length : 0;
+  const galleriesCount = galleryStats ? galleryStats.length : 0;
+  const wordsCount = wordStats ? wordStats.length : 0;
+  
+  const chartBlogData = {
+    labels: ['Blogs - Galleries - Words'],
+    datasets: [
+      {
+        label: 'Blogs',
+        data: [blogsCount],
+        backgroundColor: '#68c8b1',
+      },
+      {
+        label: 'Galleries',
+        data: [galleriesCount],
+        backgroundColor: '#6870FA',
+      },
+      {
+        label: 'Words',
+        data: [wordsCount],
+        backgroundColor: '#35466a',
+      },
+    ],
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/users'); // Replace with your actual API endpoint
+        const data = await response.json();
+        setUserStats(data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  let adminCount = 0;
+  let userCount = 0;
+
+  if (userStats) {
+    adminCount = userStats.filter(user => user.role === 'admin').length;
+    userCount = userStats.length - adminCount;
+  }
+
+const chartData = {
+  labels: ['Admin', 'User'],
+  datasets: [
+    {
+      data: [adminCount, userCount],
+      backgroundColor: ['#68c8b1', '#6870FA'],
+    },
+  ],
+};
+
+
   const CLOUD_NAME = 'dqtnjtoby'
   const UPLOAD_PRESET = 'gunes_blog'
   const router = useRouter();
@@ -174,52 +296,51 @@ const uploadImage = async () => {
   }
 }
   return (
-    <div>
-<div className='bg-[#F4F2DE] flex flex-col justify-center items-center w-[70%] mx-auto mt-10 mb-10 rounded-md shadow-lg py-4'>
-  <div>
-    <h1 className='text-lg mb-4'>Kullanici Olustur</h1>
-  </div>
-  <div className='flex flex-col justify-center items-center'>
-    <form  ref={userForm} onSubmit={handleSubmit}>
-      <input className='rounded-md pl-2 w-52 block' type="text" placeholder='Username' onChange={(e) => setUsername(e.target.value)} />
-      <input className='rounded-md pl-2 w-52 block my-4' type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)} />
-      <select className='rounded-md pl-2 w-52 block mx-auto' value={role} id="roles" onChange={(e) => setRole(e.target.value)} >
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-
-    <div className='flex justify-center items-center mt-6'>
-      <button className='w-20 mx-auto bg-[#C7D3D1] text-black p-1 rounded-md border-[1px] border-white'>Olustur</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div className='bg-[#F4F2DE] flex flex-col justify-center items-center w-[70%] mx-auto mt-10 mb-10 rounded-md shadow-lg py-4'>
-  <div>
-  <h1 className='text-lg mb-4'>Kelime Olustur</h1>
-  </div>
-      <form ref={kelimeForm} onSubmit={handleKelime}>
-        <input className='rounded-md pl-2 block w-52 ' type="text" placeholder='Kelime' onChange={(e) => setKelime(e.target.value)} />
-        <input className='rounded-md pl-2 block my-4 w-52 ' type="text" placeholder='Anlami' onChange={(e) => setDesc(e.target.value)} />
-        <button className='block mt-2 w-20 mx-auto bg-[#C7D3D1] text-black p-1 rounded-md border-[1px] border-white' >Olustur</button>
-      </form>
-      </div>
-
-      <div>
-      <div className='bg-[#F4F2DE] flex flex-col justify-center items-center w-[70%] mx-auto mt-10 mb-10 rounded-md shadow-lg py-4'>
-      <h1 className='text-lg mb-4'>Fotograf Olustur</h1>
-                <form ref={galleryForm} onSubmit={handleGallery}>
-                    <input className='block w-52 rounded-md pl-2' type="text" placeholder='Title...' onChange={(e) => setTitle(e.target.value)} />
-                    <label className='block text-center w-32 mx-auto bg-[#E9B384] text-white rounded-md p-1 cursor-pointer my-4' htmlFor='image'>
-                        Upload Image
-                    </label>
-                    <input id='image' type="file" style={{ display: 'none' }} onChange={(e) => setPhoto(e.target.files[0])} />
-                    <button className='block mt-2 w-20 mx-auto bg-[#C7D3D1] text-black p-1 rounded-md border-[1px] border-white'>Olustur</button>
-                </form>
-            </div>
-            <ToastContainer />
+    <div className='bg-[#141B2D] pb-20'>
+  
+      <div className='flex-col p-10'>
+        <h1 className='text-white text-3xl uppercase'>Admin paneli</h1>
+        <h3 className='text-[#68C8B1] mt-1'>Admin Paneline Hos Geldin <span className='underline'>{userName}</span></h3>
+        <hr />
         </div>
+      <div className='flex justify-center mx-auto mt-10 gap-24  flex-wrap'>
+     <div>
+      <Doughnut data={chartData} style={{ height: '200px', width: '200px' }} />
+      </div>   
+      <div>
+      <Bar data={chartBlogData} style={{ height: '450px', width: '450px' }} />
+      </div>   
+        </div>
+        <div className='flex justify-center items-center gap-20 mt-20 flex-wrap'>
+          <Link href='/panel/kullanici-yonetimi'>
+          <div className='bg-[#202A40] hover:bg-[#35466a] max-w-[240px] py-8 min-h-[184px] border-[1px] border-white rounded-md flex flex-col gap-3 justify-center items-center cursor-pointer'>
+            <div className='flex justify-center text-white text-center w-full mt-2 text-xl'><AiOutlineUser size={24} />  <span className='ml-2'>Kullanici Yonetimi</span></div>
+            <p className='text-[#3DA58B] mx-auto text-center'>Kullanicilari goruntulemek, eklemek, duzenlemek veya cikarmak icin tiklayin.</p>
+          </div>
+          </Link>
+
+          <Link href='/panel/blog-yonetimi'>
+          <div className='bg-[#202A40] hover:bg-[#35466a]  max-w-[240px] py-8 min-h-[184px] border-[1px] border-white  rounded-md flex flex-col gap-3 justify-center items-center cursor-pointer'>
+            <div className='flex justify-center text-white text-center w-full mt-2 text-xl'><FaPencilAlt size={20} />  <span className='ml-2'>Blog Yonetimi</span></div>
+            <p className='text-[#3DA58B] mx-auto text-center px-2'>Bloglari goruntulemek, duzenlemek veya silmek icin tiklayin.</p>
+          </div>
+          </Link>
+
+          <Link href='/panel/kelime-yonetimi'>
+          <div className='bg-[#202A40] hover:bg-[#35466a]  max-w-[240px] py-8  h-fit rounded-md border-[1px] border-white  flex flex-col gap-3 justify-center items-center cursor-pointer'>
+            <div className='flex justify-center text-white text-center w-full mt-2 text-xl'><BsFillChatTextFill size={24} />  <span className='ml-2'>Kelime Yonetimi</span></div>
+            <p className='text-[#3DA58B] mx-auto text-center'>Yeni kelimeler eklemek, duzenlemek veya silmek icin tiklayin.</p>
+          </div>
+          </Link>
+
+          <Link href='/panel/galeri-yonetimi'>
+          <div className='bg-[#202A40] hover:bg-[#35466a]  max-w-[240px] py-8 h-fit rounded-md border-[1px] border-white  flex flex-col gap-3 justify-center items-center cursor-pointer'>
+            <div className='flex justify-center text-white text-center w-full mt-2 text-xl'><HiPhotograph size={24} />  <span className='ml-2'>Galeri Yonetimi</span></div>
+            <p className='text-[#3DA58B] mx-auto text-center'>Yeni fotograflar eklemek, duzenlemek veya silmek icin tiklayin.</p>
+          </div>
+          </Link>
+        </div>
+        
     </div>
   );
 }
